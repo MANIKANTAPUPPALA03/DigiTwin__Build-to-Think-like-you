@@ -1,0 +1,3 @@
+src/components/dashboard/InboxesWidget.tsx(1,24): error TS2305: Module '"../../hooks/useAgentData"' has no exported member 'Email'.
+src/pages/GoogleOAuth.tsx(45,35): error TS2554: Expected 0 arguments, but got 1.
+src/Signup.tsx(3,25): error TS2307: Cannot find module '../context/AuthContext' or its corresponding type declarations.

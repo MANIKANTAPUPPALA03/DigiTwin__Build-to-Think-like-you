@@ -1,0 +1,39 @@
+# Environment files
+.env
+.env.local
+*.env.production
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+
+# Node
+node_modules/
+dist/
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+
+# Build
+build/
+
+backend/token.json
+backend/client_secret.json
+backend/firebase-key.json
