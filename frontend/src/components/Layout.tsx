@@ -15,7 +15,6 @@ import { Link, useLocation } from "react-router-dom";
 import FloatingAssistant from "./FloatingAssistant";
 import logo from "../assets/logo.png";
 import { taskAPI } from "../services/api";
-import { tasks } from "../data/tasks";
 import { useAuth } from "../context/AuthContext";
 
 interface LayoutProps {
@@ -32,8 +31,20 @@ const Layout: React.FC<LayoutProps> = ({ isDark, setIsDark, children }) => {
     // Initialize from localStorage, default to true
     return localStorage.getItem('agent_active') !== 'false';
   });
+  const [highPriorityTasks, setHighPriorityTasks] = React.useState<any[]>([]);
 
   const { user } = useAuth();
+
+  // Fetch high priority tasks
+  React.useEffect(() => {
+    fetch("http://localhost:8000/priority-tasks")
+      .then(res => res.json())
+      .then(data => {
+        const highTasks = data.tasks?.filter((t: any) => t.priority === 'high') || [];
+        setHighPriorityTasks(highTasks);
+      })
+      .catch(err => console.error('Failed to fetch tasks:', err));
+  }, []);
 
   // Handle agent toggle
   const handleAgentToggle = async () => {
@@ -51,9 +62,6 @@ const Layout: React.FC<LayoutProps> = ({ isDark, setIsDark, children }) => {
       localStorage.setItem('agent_active', 'true');
     }
   };
-
-  // High priority tasks for notification
-  const highPriorityTasks = tasks.filter(t => t.priority === 'high' && t.status === 'pending');
 
   // New task state
   const [newTask, setNewTask] = React.useState({
