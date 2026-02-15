@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const Signup: React.FC = () => {
-  const { signup, error } = useAuth();
+  const { signup, loginWithGoogle, error } = useAuth();
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -24,9 +24,16 @@ const Signup: React.FC = () => {
     }
   };
 
-  const handleGoogleSignup = () => {
-    // Redirect to backend OAuth endpoint for real Gmail access
-    window.location.href = "http://localhost:8000/login";
+  const handleGoogleSignup = async () => {
+    setLoading(true);
+    try {
+      await loginWithGoogle();
+      navigate("/dashboard");
+    } catch {
+      // error handled in context
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

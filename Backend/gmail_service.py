@@ -1,50 +1,104 @@
-from googleapiclient.discovery import build
 import base64
+from googleapiclient.discovery import build
+import traceback
+import datetime
 
-def get_last_20_emails(credentials):
+def log_debug(msg):
+    with open("backend_debug.log", "a", encoding="utf-8") as f:
+        f.write(f"[{datetime.datetime.now()}] {msg}\n")
+
+
+
+def fetch_emails(credentials, max_results: int = 20) -> list[dict]:
+    """
+    Fetch recent emails from Gmail using the user's OAuth credentials.
+    Returns a list of email dicts: {id, sender, subject, snippet, body, date}
+    """
     service = build("gmail", "v1", credentials=credentials)
 
-    results = service.users().messages().list(
-        userId="me",
-        maxResults=20
-    ).execute()
+    # Get message list
+    try:
+        log_debug(f"🔍 Fetching emails (max={max_results})...")
 
-    messages = results.get("messages", [])
-    emails = []
-
-    for msg in messages:
-        msg_data = service.users().messages().get(
+        results = service.users().messages().list(
             userId="me",
-            id=msg["id"],
-            format="full"
+            maxResults=max_results,
+            labelIds=["INBOX"],
         ).execute()
 
-        headers = msg_data["payload"]["headers"]
+        messages = results.get("messages", [])
+        log_debug(f"📧 Gmail API found {len(messages)} messages")
+        
+        if not messages:
+            log_debug("⚠️ Gmail API returned NO messages")
+            return []
+    except Exception as e:
+        log_debug(f"❌ Gmail API list failed: {e}")
+        traceback.print_exc()
+        return []
 
-        subject = sender = date = ""
-        for h in headers:
-            if h["name"] == "Subject":
-                subject = h["value"]
-            if h["name"] == "From":
-                sender = h["value"]
-            if h["name"] == "Date":
-                date = h["value"]
+    emails = []
+    for msg_info in messages:
+        try:
+            msg = service.users().messages().get(
+                userId="me",
+                id=msg_info["id"],
+                format="full",
+            ).execute()
 
-        body = ""
-        if "parts" in msg_data["payload"]:
-            for part in msg_data["payload"]["parts"]:
-                if part["mimeType"] == "text/plain":
-                    body = base64.urlsafe_b64decode(
-                        part["body"]["data"]
-                    ).decode("utf-8", errors="ignore")
+            headers = {h["name"]: h["value"] for h in msg.get("payload", {}).get("headers", [])}
 
-        emails.append({
-            "id": msg["id"],
-            "subject": subject,
-            "sender": sender,
-            "date": date,
-            "snippet": msg_data.get("snippet", ""),
-            "body": body
-        })
+            # Extract both text and html body
+            body_text, body_html = _extract_body(msg.get("payload", {}))
+
+            emails.append({
+                "id": msg_info["id"],
+                "sender": headers.get("From", "Unknown"),
+                "subject": headers.get("Subject", "(No Subject)"),
+                "snippet": msg.get("snippet", ""),
+                "body": body_text or "",
+                "body_html": body_html or "",
+                "date": headers.get("Date", ""),
+            })
+        except Exception as e:
+            print(f"Error fetching email {msg_info['id']}: {e}")
+            continue
 
     return emails
+
+
+def _extract_body(payload: dict) -> tuple[str, str]:
+    """Extract both text/plain and text/html body from a Gmail message payload.
+    Returns (body_text, body_html) tuple."""
+    body_text = ""
+    body_html = ""
+    
+    # Simple single-part message
+    mime = payload.get("mimeType", "")
+    data = payload.get("body", {}).get("data", "")
+    
+    if mime == "text/plain" and data:
+        body_text = base64.urlsafe_b64decode(data).decode("utf-8", errors="replace")
+    elif mime == "text/html" and data:
+        body_html = base64.urlsafe_b64decode(data).decode("utf-8", errors="replace")
+
+    # Multipart — look through parts
+    parts = payload.get("parts", [])
+    for part in parts:
+        part_mime = part.get("mimeType", "")
+        part_data = part.get("body", {}).get("data", "")
+        
+        if part_mime == "text/plain" and part_data and not body_text:
+            body_text = base64.urlsafe_b64decode(part_data).decode("utf-8", errors="replace")
+        elif part_mime == "text/html" and part_data and not body_html:
+            body_html = base64.urlsafe_b64decode(part_data).decode("utf-8", errors="replace")
+        
+        # Nested multipart (e.g. multipart/alternative inside multipart/mixed)
+        if part.get("parts"):
+            nested_text, nested_html = _extract_body(part)
+            if nested_text and not body_text:
+                body_text = nested_text
+            if nested_html and not body_html:
+                body_html = nested_html
+
+    return body_text, body_html

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { apiFetch } from "../lib/api";
 
 interface Email {
   id: string;
@@ -15,7 +16,7 @@ const EmailsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:8000/emails")
+    apiFetch("/emails")
       .then((res) => res.json())
       .then((data) => {
         setEmails(data);
@@ -51,10 +52,9 @@ const EmailsPage: React.FC = () => {
             key={email.id}
             onClick={() => setSelectedEmail(email)}
             className={`p-3 rounded-lg mb-2 cursor-pointer
-              ${
-                selectedEmail?.id === email.id
-                  ? "bg-slate-800"
-                  : "hover:bg-slate-900"
+              ${selectedEmail?.id === email.id
+                ? "bg-slate-800"
+                : "hover:bg-slate-900"
               }`}
           >
             <p className="font-semibold text-sm truncate">

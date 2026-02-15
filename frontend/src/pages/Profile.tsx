@@ -8,14 +8,22 @@ interface SettingsProps {
 }
 
 const Profile: React.FC<SettingsProps> = ({ isDark, setIsDark }) => {
-    const { user, logout } = useAuth();
+    const { user, logout, updateProfile } = useAuth();
     const [profileName, setProfileName] = useState(user?.name || '');
     const [email] = useState(user?.email || '');
+    const [saving, setSaving] = useState(false);
 
-    const handleSave = () => {
-        // In a real app, this would update the backend
-        console.log('Saving profile...', { name: profileName, email });
-        alert('Profile updated!');
+    const handleSave = async () => {
+        if (!profileName.trim()) return;
+        setSaving(true);
+        try {
+            await updateProfile(profileName);
+            alert('Profile updated successfully!');
+        } catch (error) {
+            console.error(error);
+            alert('Failed to update profile');
+        }
+        setSaving(false);
     };
 
     return (
@@ -48,8 +56,8 @@ const Profile: React.FC<SettingsProps> = ({ isDark, setIsDark }) => {
                                 value={profileName}
                                 onChange={(e) => setProfileName(e.target.value)}
                                 className={`w-full px-4 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDark
-                                        ? 'bg-slate-800 border-slate-700 text-white'
-                                        : 'bg-slate-50 border-slate-200 text-slate-900'
+                                    ? 'bg-slate-800 border-slate-700 text-white'
+                                    : 'bg-slate-50 border-slate-200 text-slate-900'
                                     }`}
                             />
                         </div>
@@ -62,20 +70,20 @@ const Profile: React.FC<SettingsProps> = ({ isDark, setIsDark }) => {
                                 value={email}
                                 disabled
                                 className={`w-full px-4 py-2 rounded-xl border opacity-70 cursor-not-allowed ${isDark
-                                        ? 'bg-slate-800 border-slate-700 text-slate-400'
-                                        : 'bg-slate-100 border-slate-200 text-slate-500'
+                                    ? 'bg-slate-800 border-slate-700 text-slate-400'
+                                    : 'bg-slate-100 border-slate-200 text-slate-500'
                                     }`}
                             />
                         </div>
                         <button
                             onClick={handleSave}
-                            className={`px-6 py-2 text-white rounded-xl font-medium transition-all shadow-md hover:scale-105 ${
-                                isDark 
-                                ? 'bg-gradient-to-r from-purple-600 to-cyan-600 hover:brightness-110' 
+                            disabled={saving}
+                            className={`px-6 py-2 text-white rounded-xl font-medium transition-all shadow-md hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed ${isDark
+                                ? 'bg-gradient-to-r from-purple-600 to-cyan-600 hover:brightness-110'
                                 : 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:brightness-110'
-                            }`}
+                                }`}
                         >
-                            Save Changes
+                            {saving ? 'Saving...' : 'Save Changes'}
                         </button>
                     </div>
                 </div>

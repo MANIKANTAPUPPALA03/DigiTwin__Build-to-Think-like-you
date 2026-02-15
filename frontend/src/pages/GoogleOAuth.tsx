@@ -30,24 +30,13 @@ const GoogleOAuth: React.FC = () => {
         setVerifying(true);
         setError(null);
 
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 800));
-
-        // Check if user exists in our local "database"
-        const usersDbStr = localStorage.getItem('users_db');
-        const usersDb = usersDbStr ? JSON.parse(usersDbStr) : {};
-
-        if (usersDb[account.email]) {
-            // User exists, proceed to login
-            setVerifying(false);
-            setLoading(true);
-            await new Promise(resolve => setTimeout(resolve, 1500));
+        try {
             await loginWithGoogle();
             navigate('/dashboard');
-        } else {
-            // User does not exist
+        } catch (err: any) {
+            console.error("Google login failed:", err);
+            setError("Failed to sign in with Google. Please try again.");
             setVerifying(false);
-            setError(`Couldn't find your Google Account. Try using a different account or sign up first.`);
         }
     };
 

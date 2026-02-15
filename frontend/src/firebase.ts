@@ -15,4 +15,8 @@ const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// Google provider with Gmail + Calendar scopes
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.addScope("https://www.googleapis.com/auth/gmail.readonly");
+googleProvider.addScope("https://www.googleapis.com/auth/calendar.readonly");

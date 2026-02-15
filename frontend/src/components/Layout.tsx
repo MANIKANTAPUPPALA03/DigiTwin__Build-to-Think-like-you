@@ -15,6 +15,7 @@ import { Link, useLocation } from "react-router-dom";
 import FloatingAssistant from "./FloatingAssistant";
 import logo from "../assets/logo.png";
 import { taskAPI } from "../services/api";
+import { apiFetch } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 
 interface LayoutProps {
@@ -37,7 +38,7 @@ const Layout: React.FC<LayoutProps> = ({ isDark, setIsDark, children }) => {
 
   // Fetch high priority tasks
   React.useEffect(() => {
-    fetch("http://localhost:8000/priority-tasks")
+    apiFetch("/priority-tasks")
       .then(res => res.json())
       .then(data => {
         const highTasks = data.tasks?.filter((t: any) => t.priority === 'high') || [];

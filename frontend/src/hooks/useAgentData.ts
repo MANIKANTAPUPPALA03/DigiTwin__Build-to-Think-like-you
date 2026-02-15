@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { apiFetch } from "../lib/api";
 
 export interface AgentTask {
   id: string;
@@ -19,17 +20,14 @@ export interface Email {
 }
 
 export function useAgentData() {
-  const [emails, setEmails] = useState<Email[]>([]);
+  const [emails] = useState<Email[]>([]);
   const [tasks, setTasks] = useState<AgentTask[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:8000/emails")
+    apiFetch("/tasks")
       .then(res => res.json())
-      .then(setEmails);
-
-    fetch("http://localhost:8000/tasks")
-      .then(res => res.json())
-      .then(setTasks);
+      .then(data => Array.isArray(data) ? setTasks(data) : setTasks([]))
+      .catch(() => setTasks([]));
   }, []);
 
   return { emails, tasks };

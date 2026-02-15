@@ -41,6 +41,15 @@ const ProtectedRoute = ({
   // Check for OAuth authentication
   const isOAuthAuthenticated = localStorage.getItem('oauth_authenticated') === 'true';
 
+  // Wait for AuthContext loading to finish
+  // We need to access loading from context, but first let's update AuthContext interface to include it
+  // For now, assuming AuthContext blocks rendering children while loading, so this component only mounts after loading? 
+  // NO, AuthContext renders children only after loading is false. 
+  // So ProtectedRoute will only run when loading is false. 
+  // wait... AuthContext.tsx: if (loading) return <Spinner /> else return <Provider>{children}</Provider>
+  // So children (Routes) are NOT rendered until loading is false.
+  // This means ProtectedRoute doesn't need to check loading.
+
   if (!isAuthenticated && !isOAuthAuthenticated) {
     return <Navigate to="/login" replace />;
   }

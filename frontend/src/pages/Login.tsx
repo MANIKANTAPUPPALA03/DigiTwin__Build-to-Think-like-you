@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import logo from "../assets/logo.png";
 
 const Login: React.FC = () => {
-  const { login, error } = useAuth();
+  const { login, loginWithGoogle, error } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -25,8 +25,15 @@ const Login: React.FC = () => {
   };
 
   const handleGoogleLogin = async () => {
-    // Redirect to backend OAuth endpoint for real Gmail access
-    window.location.href = "http://localhost:8000/login";
+    setLoading(true);
+    try {
+      await loginWithGoogle();
+      navigate("/dashboard");
+    } catch {
+      // error handled in context
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
