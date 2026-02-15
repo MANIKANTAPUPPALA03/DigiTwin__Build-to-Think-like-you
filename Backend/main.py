@@ -26,6 +26,8 @@ app.add_middleware(
         "http://localhost:5173",
         "http://localhost:5174",
         "http://localhost:3000",
+        "https://digitwin-6039a.web.app",
+        "https://digitwin-6039a.firebaseapp.com",
         FRONTEND_URL,
     ],
     allow_credentials=True,
