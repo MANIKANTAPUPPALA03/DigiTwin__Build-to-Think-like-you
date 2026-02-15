@@ -2,7 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   onAuthStateChanged,
   signOut,
 } from "firebase/auth";
@@ -79,6 +80,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return unsub;
   }, []);
 
+  /* ---------- HANDLE GOOGLE REDIRECT RESULT ---------- */
+  useEffect(() => {
+    getRedirectResult(auth).then(async (result) => {
+      if (!result) return;
+      const fbUser = result.user;
+
+      // Save user to Firestore if first time
+      const userRef = doc(db, "users", fbUser.uid);
+      const snap = await getDoc(userRef);
+
+      if (!snap.exists()) {
+        await setDoc(userRef, {
+          name: fbUser.displayName,
+          email: fbUser.email,
+          avatar: fbUser.photoURL,
+          provider: "google",
+          createdAt: serverTimestamp(),
+        });
+      }
+
+      // Request GIS token for Gmail/Calendar
+      try {
+        const { requestGoogleAccessToken } = await import("../hooks/useGoogleToken");
+        await requestGoogleAccessToken();
+        console.log("✅ GIS Gmail/Calendar token obtained!");
+      } catch (gisErr) {
+        console.warn("⚠️ GIS token request failed (user can retry from Emails page):", gisErr);
+      }
+    }).catch((err) => {
+      console.error("Redirect result error:", err);
+    });
+  }, []);
+
   /* ---------- GET AUTH HEADERS ---------- */
   const getAuthHeaders = async (): Promise<Record<string, string>> => {
     const fbUser = auth.currentUser;
@@ -126,32 +160,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginWithGoogle = async () => {
     try {
       setError(null);
-      const result = await signInWithPopup(auth, googleProvider);
-      const fbUser = result.user;
-
-      // Save user to Firestore if first time
-      const userRef = doc(db, "users", fbUser.uid);
-      const snap = await getDoc(userRef);
-
-      if (!snap.exists()) {
-        await setDoc(userRef, {
-          name: fbUser.displayName,
-          email: fbUser.email,
-          avatar: fbUser.photoURL,
-          provider: "google",
-          createdAt: serverTimestamp(),
-        });
-      }
-
-      // Now request a SEPARATE access token via GIS for Gmail/Calendar
-      // This uses the external GCP project where APIs are enabled
-      try {
-        const { requestGoogleAccessToken } = await import("../hooks/useGoogleToken");
-        await requestGoogleAccessToken();
-        console.log("✅ GIS Gmail/Calendar token obtained!");
-      } catch (gisErr) {
-        console.warn("⚠️ GIS token request failed (user can retry from Emails page):", gisErr);
-      }
+      await signInWithRedirect(auth, googleProvider);
     } catch (err: any) {
       setError(err.message);
       throw err;
