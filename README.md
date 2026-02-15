@@ -37,19 +37,38 @@ DigiTwin is an intelligent personal agent that helps you manage your digital lif
    - `GOOGLE_CREDENTIALS`: (Paste contents of `credentials.json` here)
    *(Note: You may need to modify `main.py` to read credentials from env vars instead of files for production, or use Render's "Secret Files" feature to upload the JSON files directly.)*
 
-### 3. Frontend Deployment (Vercel / Netlify)
-1. Import the repo to **Vercel**.
-2. Select `frontend` as the Root Directory.
-3. **Build Command**: `npm run build`
-4. **Output Directory**: `dist`
-5. **Environment Variables**:
-   - `VITE_API_URL`: `https://your-backend-url.onrender.com`
-   - `VITE_FIREBASE_API_KEY`: ...
-   - `VITE_FIREBASE_AUTH_DOMAIN`: ...
-   - `VITE_FIREBASE_PROJECT_ID`: ...
-   - `VITE_FIREBASE_STORAGE_BUCKET`: ...
-   - `VITE_FIREBASE_MESSAGING_SENDER_ID`: ...
-   - `VITE_FIREBASE_APP_ID`: ...
+### 3. Frontend Deployment (Firebase Hosting)
+1. Install Firebase tools globally (if not installed):
+   ```bash
+   npm install -g firebase-tools
+   ```
+2. Login to Firebase:
+   ```bash
+   firebase login
+   ```
+3. Initialize Hosting (if needed, or just skip if firebase.json is present):
+   ```bash
+   firebase init hosting
+   ```
+   *(Select your existing project, use `frontend/dist` as public directory, configure as single-page app: Yes)*
+
+4. **Build and Deploy**:
+   ```bash
+   cd frontend
+   npm run build
+   cd ..
+   firebase deploy --only hosting
+   ```
+   *(Ensure you have set up your `.env.production` in `frontend/` before building! For Firebase Hosting, environmental variables must be baked into the build.)*
+
+**Important**: Since Firebase Hosting serves static files, you MUST create a `.env.production` file in the `frontend` directory with your real backend URL and Firebase config before running `npm run build`.
+
+Example `frontend/.env.production`:
+```
+VITE_API_URL=https://your-backend.onrender.com
+VITE_FIREBASE_API_KEY=...
+...
+```
 
 ---
 

@@ -5,20 +5,35 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Initialize Firebase Admin SDK (graceful — won't crash if key is missing)
+# Initialize Firebase Admin SDK
+# Priority 1: FIREBASE_CREDENTIALS env var (JSON string)
+# Priority 2: FIREBASE_KEY_PATH file path (default: firebase-key.json)
+
+firebase_creds_json = os.getenv("FIREBASE_CREDENTIALS")
 _firebase_key_path = os.getenv("FIREBASE_KEY_PATH", "firebase-key.json")
 db = None
 
 try:
     if not firebase_admin._apps:
-        if os.path.exists(_firebase_key_path):
+        cred = None
+        
+        if firebase_creds_json:
+            # Load from JSON string (Release/Cloud environment)
+            import json
+            cred_dict = json.loads(firebase_creds_json)
+            cred = credentials.Certificate(cred_dict)
+            print("✅ Firebase initialized from FIREBASE_CREDENTIALS env var")
+        elif os.path.exists(_firebase_key_path):
+            # Load from file (Local environment)
             cred = credentials.Certificate(_firebase_key_path)
+            print(f"✅ Firebase initialized from file: {_firebase_key_path}")
+        else:
+            print(f"⚠️  Firebase key not found (Env: FIREBASE_CREDENTIALS or File: {_firebase_key_path}) — Firestore disabled")
+
+        if cred:
             firebase_admin.initialize_app(cred)
             db = firestore.client()
-            print(f"✅ Firebase initialized with {_firebase_key_path}")
-        else:
-            print(f"⚠️  Firebase key not found at '{_firebase_key_path}' — Firestore disabled")
-            print("   Download it from Firebase Console → Project Settings → Service Accounts")
+            
 except Exception as e:
     print(f"⚠️  Firebase initialization failed: {e}")
 
