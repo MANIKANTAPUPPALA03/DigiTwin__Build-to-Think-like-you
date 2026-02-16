@@ -4,7 +4,7 @@
  * to get an access token with Gmail/Calendar scopes.
  */
 
-const CLIENT_ID = "508843395715-nq2s6kael8bqp866mmj070ghfk26iq4p.apps.googleusercontent.com";
+const CLIENT_ID = "508843395715-1uqdf51nh2svs15a65d5e9u9okvec3at.apps.googleusercontent.com";
 const SCOPES = "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/calendar.readonly";
 
 declare global {
@@ -31,7 +31,7 @@ export function requestGoogleAccessToken(): Promise<string> {
             return;
         }
 
-        // Use Code Client with popup UX to avoid page reload
+        // Use Code Client with popup UX (now backed by correct origins)
         const client = window.google.accounts.oauth2.initCodeClient({
             client_id: CLIENT_ID,
             scope: SCOPES,

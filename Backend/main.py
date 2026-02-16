@@ -58,9 +58,29 @@ class GoogleAuthRequest(BaseModel):
     code: str
     redirect_uri: str
 
+@app.get("/auth/callback")
+async def google_auth_callback(code: str, error: str = None):
+    """Handle Google OAuth callback (server-side flow)."""
+    if error:
+        return JSONResponse(status_code=400, content={"error": error})
+    
+    # Exchange code using the registered redirect_uri
+    redirect_uri = "http://localhost:8000/auth/callback"
+    token = auth.exchange_code_for_token(code, redirect_uri)
+    
+    if token:
+        # Redirect back to frontend with token
+        from fastapi.responses import RedirectResponse
+        frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
+        return RedirectResponse(f"{frontend_url}/emails?google_token={token}")
+    
+    return JSONResponse(status_code=400, content={"error": "Failed to exchange code"})
+
+
 @app.post("/auth/google")
 async def google_auth_exchange(req: GoogleAuthRequest):
     """Exchange auth code for access token (for mobile/redirect flow)."""
+    # ... existing code ...
     token = auth.exchange_code_for_token(req.code, req.redirect_uri)
     if token:
         return {"access_token": token}
