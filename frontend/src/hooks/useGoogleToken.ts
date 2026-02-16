@@ -12,11 +12,12 @@ declare global {
         google?: {
             accounts: {
                 oauth2: {
-                    initTokenClient: (config: {
+                    initCodeClient: (config: {
                         client_id: string;
                         scope: string;
-                        callback: (response: { access_token?: string; error?: string }) => void;
-                    }) => { requestAccessToken: () => void };
+                        ux_mode: string;
+                        callback: (response: { code?: string; error?: string; error_description?: string }) => void;
+                    }) => { requestCode: () => void };
                 };
             };
         };
@@ -30,25 +31,54 @@ export function requestGoogleAccessToken(): Promise<string> {
             return;
         }
 
-        const client = window.google.accounts.oauth2.initTokenClient({
+        // Use Code Client with popup UX to avoid page reload
+        const client = window.google.accounts.oauth2.initCodeClient({
             client_id: CLIENT_ID,
             scope: SCOPES,
+            ux_mode: 'popup',
             callback: (response) => {
                 if (response.error) {
-                    console.error("❌ GIS token error:", response.error);
-                    reject(new Error(response.error));
+                    console.error("❌ OAuth error:", response.error, response.error_description);
+                    reject(new Error(response.error_description || response.error));
                     return;
                 }
-                if (response.access_token) {
-                    console.log("✅ GIS access token obtained (length:", response.access_token.length, ")");
-                    localStorage.setItem("google_access_token", response.access_token);
-                    resolve(response.access_token);
+                if (response.code) {
+                    console.log("✅ Auth Code obtained via Popup");
+                    exchangeCodeForToken(response.code).then(resolve).catch(reject);
                 } else {
-                    reject(new Error("No access token in GIS response"));
+                    reject(new Error("No authorization code received — user may have closed the popup"));
                 }
             },
         });
 
-        client.requestAccessToken();
+        client.requestCode();
     });
+}
+
+// Exchange auth code for access token via backend
+// For popup mode, redirect_uri MUST be "postmessage" — this is a special Google value
+async function exchangeCodeForToken(code: string): Promise<string> {
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/auth/google`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code, redirect_uri: "postmessage" }),
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || "Failed to exchange code");
+        }
+
+        const data = await response.json();
+        if (data.access_token) {
+            localStorage.setItem("google_access_token", data.access_token);
+            console.log("✅ Google access token saved to localStorage");
+            return data.access_token;
+        }
+        throw new Error("No access token returned");
+    } catch (error) {
+        console.error("❌ Token exchange failed:", error);
+        throw error;
+    }
 }

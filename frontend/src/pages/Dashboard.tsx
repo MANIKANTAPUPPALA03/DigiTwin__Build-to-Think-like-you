@@ -32,13 +32,6 @@ const Dashboard = ({ isDark }: DashboardProps) => {
   const [agentResult, setAgentResult] = useState<AgentResult | null>(null);
   const [clearing, setClearing] = useState(false);
 
-  const bg = isDark ? "#0f172a" : "#f8fafc";
-  const card = isDark ? "#1e293b" : "#ffffff";
-  const border = isDark ? "#334155" : "#e2e8f0";
-  const textPrimary = isDark ? "#e2e8f0" : "#1e293b";
-  const textSecondary = isDark ? "#94a3b8" : "#64748b";
-  const textMuted = isDark ? "#64748b" : "#94a3b8";
-
   const fetchTasks = () => {
     apiFetch("/tasks")
       .then((r) => r.json())
@@ -96,66 +89,55 @@ const Dashboard = ({ isDark }: DashboardProps) => {
   };
 
   return (
-    <div style={{ padding: 24, fontFamily: "'Inter', sans-serif", color: textPrimary, background: bg, minHeight: "100%" }}>
+    <div className={`p-4 md:p-6 min-h-full ${isDark ? "bg-slate-900 text-slate-200" : "bg-slate-50 text-slate-900"}`}>
       {/* ─── Stats Cards ─── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
           { icon: <ListTodo size={20} />, label: "Total Tasks", value: tasks.length, color: "#6366f1" },
           { icon: <Zap size={20} />, label: "High Priority", value: highPriority.length, color: "#ef4444" },
           { icon: <Calendar size={20} />, label: "Due Today", value: todayTasks.length, color: "#f59e0b" },
           { icon: <CheckCircle2 size={20} />, label: "Completed", value: completedTasks.length, color: "#22c55e" },
         ].map(({ icon, label, value, color }) => (
-          <div key={label} style={{ background: card, borderRadius: 14, padding: "20px 24px", border: `1px solid ${border}`, display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: `${color}15`, display: "flex", alignItems: "center", justifyContent: "center", color }}>
+          <div key={label} className={`p-5 rounded-2xl border flex items-center gap-4 ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"}`}>
+            <div style={{ background: `${color}15`, color }} className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0">
               {icon}
             </div>
             <div>
-              <div style={{ fontSize: 24, fontWeight: 700 }}>{value}</div>
-              <div style={{ fontSize: 12, color: textSecondary }}>{label}</div>
+              <div className="text-2xl font-bold">{value}</div>
+              <div className={`text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>{label}</div>
             </div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* ─── AI Agent Panel ─── */}
-        <div style={{ background: card, borderRadius: 16, padding: 24, border: `1px solid ${border}` }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #6366f1, #8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div className={`p-6 rounded-2xl border ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"}`}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center flex-shrink-0">
               <Bot size={18} color="#fff" />
             </div>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>AI Agent</h3>
-              <p style={{ fontSize: 12, color: textSecondary, margin: 0 }}>Email → Task extraction with Groq AI</p>
+              <h3 className="text-base font-bold m-0">AI Agent</h3>
+              <p className={`text-xs m-0 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Email → Task extraction with Groq AI</p>
             </div>
           </div>
 
-          <p style={{ fontSize: 13, color: textSecondary, lineHeight: 1.6, marginBottom: 16 }}>
+          <p className={`text-sm mb-4 leading-relaxed ${isDark ? "text-slate-400" : "text-slate-500"}`}>
             The agent reads your recent emails, checks your Google Calendar for conflicts, and uses AI to extract actionable tasks — no duplicates.
           </p>
 
-          <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+          <div className="flex flex-col sm:flex-row gap-3 mb-4">
             <button
               onClick={runAgent}
               disabled={agentRunning}
-              style={{
-                flex: 1,
-                padding: "12px 20px",
-                borderRadius: 10,
-                border: "none",
-                background: agentRunning ? (isDark ? "#334155" : "#e2e8f0") : "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                color: agentRunning ? textSecondary : "#fff",
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: agentRunning ? "not-allowed" : "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-              }}
+              className={`flex-1 py-3 px-5 rounded-xl border-none text-sm font-semibold cursor-pointer flex items-center justify-center gap-2 transition-all ${agentRunning
+                ? (isDark ? "bg-slate-700 text-slate-400 cursor-not-allowed" : "bg-slate-200 text-slate-500 cursor-not-allowed")
+                : "bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-500/20 active:scale-95 hover:brightness-110"
+                }`}
             >
               {agentRunning ? (
-                <><RefreshCw size={14} style={{ animation: "spin 1s linear infinite" }} /> Running...</>
+                <><RefreshCw size={14} className="animate-spin" /> Running...</>
               ) : (
                 <><Sparkles size={14} /> Run AI Agent</>
               )}
@@ -164,52 +146,42 @@ const Dashboard = ({ isDark }: DashboardProps) => {
             <button
               onClick={clearAllTasks}
               disabled={clearing || tasks.length === 0}
-              style={{
-                padding: "12px 16px",
-                borderRadius: 10,
-                border: `1px solid ${isDark ? "#7f1d1d" : "#fecaca"}`,
-                background: "transparent",
-                color: "#ef4444",
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: clearing || tasks.length === 0 ? "not-allowed" : "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                opacity: tasks.length === 0 ? 0.4 : 1,
-              }}
+              className={`py-3 px-4 rounded-xl text-sm font-semibold cursor-pointer flex items-center justify-center gap-2 border bg-transparent transition-all ${clearing || tasks.length === 0
+                ? "opacity-50 cursor-not-allowed border-slate-200 text-slate-400"
+                : isDark
+                  ? "border-red-900 text-red-500 hover:bg-red-900/20"
+                  : "border-red-200 text-red-500 hover:bg-red-50"
+                }`}
             >
-              <Trash2 size={14} /> Clear All
+              <Trash2 size={14} /> Clear
             </button>
           </div>
 
           {/* Agent Result */}
           {agentResult && (
-            <div style={{
-              padding: 14,
-              borderRadius: 10,
-              background: agentResult.status === "success" ? (isDark ? "#052e16" : "#f0fdf4") : (isDark ? "#1e1b4b" : "#eef2ff"),
-              border: `1px solid ${agentResult.status === "success" ? (isDark ? "#166534" : "#bbf7d0") : (isDark ? "#3730a3" : "#c7d2fe")}`,
-            }}>
+            <div className={`p-4 rounded-xl border ${agentResult.status === "success"
+              ? (isDark ? "bg-green-950/30 border-green-900" : "bg-green-50 border-green-200")
+              : (isDark ? "bg-indigo-950/30 border-indigo-900" : "bg-indigo-50 border-indigo-200")
+              }`}>
               {agentResult.status === "success" ? (
                 <>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: isDark ? "#4ade80" : "#16a34a", margin: "0 0 4px" }}>
+                  <p className={`text-sm font-semibold mb-1 ${isDark ? "text-green-400" : "text-green-600"}`}>
                     ✅ Agent completed
                   </p>
-                  <p style={{ fontSize: 12, color: textSecondary, margin: 0 }}>
+                  <p className={`text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                     Scanned {agentResult.emails_scanned} emails → {agentResult.emails_matched} matched keywords → Created {agentResult.tasks_created} tasks
                   </p>
                 </>
               ) : agentResult.status === "no_matching_emails" ? (
-                <p style={{ fontSize: 13, color: textSecondary, margin: 0 }}>
+                <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                   📭 Scanned {agentResult.emails_scanned} emails — none matched your keyword filters
                 </p>
               ) : agentResult.status === "no_tasks_found" ? (
-                <p style={{ fontSize: 13, color: textSecondary, margin: 0 }}>
+                <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                   📭 {agentResult.emails_matched} emails matched keywords, but no new actionable tasks found
                 </p>
               ) : (
-                <p style={{ fontSize: 13, color: textSecondary, margin: 0 }}>
+                <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                   ℹ️ Agent status: {agentResult.status}
                 </p>
               )}
@@ -218,40 +190,40 @@ const Dashboard = ({ isDark }: DashboardProps) => {
         </div>
 
         {/* ─── Today's Tasks ─── */}
-        <div style={{ background: card, borderRadius: 16, padding: 24, border: `1px solid ${border}`, maxHeight: 360, overflow: "hidden", display: "flex", flexDirection: "column" }}>
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
-            <Calendar size={18} style={{ color: "#f59e0b" }} /> Today's Tasks
+        <div className={`p-6 rounded-2xl border flex flex-col max-h-[400px] ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"}`}>
+          <h3 className="text-base font-bold mb-4 flex items-center gap-2">
+            <Calendar size={18} className="text-amber-500" /> Today's Tasks
             {todayTasks.length > 0 && (
-              <span style={{ fontSize: 12, background: "#fef3c7", color: "#92400e", padding: "2px 8px", borderRadius: 10, fontWeight: 600 }}>
+              <span className="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-semibold">
                 {todayTasks.length}
               </span>
             )}
           </h3>
 
-          <div style={{ flex: 1, overflowY: "auto" }}>
+          <div className="flex-1 overflow-y-auto pr-1">
             {todayTasks.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "30px 0", color: textMuted }}>
-                <div style={{ fontSize: 28, marginBottom: 6 }}>🎉</div>
-                <p style={{ fontSize: 13 }}>No tasks due today!</p>
+              <div className={`text-center py-8 ${isDark ? "text-slate-600" : "text-slate-400"}`}>
+                <div className="text-3xl mb-2">🎉</div>
+                <p className="text-sm">No tasks due today!</p>
               </div>
             ) : (
               todayTasks.map((task) => {
                 const pc = priorityColor(task.priority);
                 return (
-                  <div key={task.id} style={{
-                    display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 10,
-                    marginBottom: 6, background: isDark ? "#0f172a" : pc.bg, borderLeft: `3px solid ${pc.dot}`,
-                  }}>
-                    <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: 13, fontWeight: 600, margin: 0, color: textPrimary }}>{task.title}</p>
-                      <p style={{ fontSize: 11, color: textSecondary, margin: "2px 0 0" }}>{task.category}</p>
+                  <div key={task.id} className={`flex items-center gap-3 p-3 rounded-xl mb-2 border-l-4 transition-colors ${isDark ? "bg-slate-900/50" : ""
+                    }`}
+                    style={{
+                      background: isDark ? undefined : pc.bg,
+                      borderLeftColor: pc.dot
+                    }}>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-semibold truncate ${isDark ? "text-slate-200" : "text-slate-800"}`}>{task.title}</p>
+                      <p className={`text-xs truncate ${isDark ? "text-slate-500" : "text-slate-500"}`}>{task.category}</p>
                     </div>
-                    <button onClick={() => completeTask(task.id)} title="Complete"
-                      style={{ background: "none", border: "none", cursor: "pointer", color: "#22c55e", padding: 4 }}>
+                    <button onClick={() => completeTask(task.id)} className="p-1.5 text-green-500 hover:bg-green-500/10 rounded-lg transition-colors">
                       <CheckCircle2 size={16} />
                     </button>
-                    <button onClick={() => deleteTask(task.id)} title="Delete"
-                      style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", padding: 4 }}>
+                    <button onClick={() => deleteTask(task.id)} className="p-1.5 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -263,56 +235,47 @@ const Dashboard = ({ isDark }: DashboardProps) => {
       </div>
 
       {/* ─── All Tasks ─── */}
-      <div style={{ marginTop: 24, background: card, borderRadius: 16, padding: 24, border: `1px solid ${border}` }}>
-        <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
-          <ListTodo size={18} style={{ color: "#6366f1" }} /> All Pending Tasks
-          <span style={{ fontSize: 12, background: isDark ? "#312e81" : "#eef2ff", color: "#6366f1", padding: "2px 8px", borderRadius: 10, fontWeight: 600 }}>
+      <div className={`mt-6 p-6 rounded-2xl border ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"}`}>
+        <h3 className="text-base font-bold mb-4 flex items-center gap-2">
+          <ListTodo size={18} className="text-indigo-500" /> All Pending Tasks
+          <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${isDark ? "bg-indigo-900/50 text-indigo-400" : "bg-indigo-50 text-indigo-600"}`}>
             {pendingTasks.length}
           </span>
         </h3>
 
         {pendingTasks.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "30px 0", color: textMuted }}>
-            <p style={{ fontSize: 14 }}>No pending tasks. Run the AI Agent to extract tasks from your emails!</p>
+          <div className={`text-center py-8 ${isDark ? "text-slate-600" : "text-slate-400"}`}>
+            <p className="text-sm">No pending tasks. Run the AI Agent to extract tasks from your emails!</p>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {pendingTasks.slice(0, 12).map((task) => {
               const pc = priorityColor(task.priority);
               return (
-                <div key={task.id} style={{
-                  display: "flex", alignItems: "center", gap: 10, padding: "10px 14px",
-                  borderRadius: 10, background: isDark ? "#0f172a" : "#fafafa",
-                  border: `1px solid ${isDark ? "#334155" : "#f1f5f9"}`,
-                }}>
-                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: pc.dot, flexShrink: 0 }} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: 13, fontWeight: 500, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{task.title}</p>
-                    <p style={{ fontSize: 11, color: textSecondary, margin: "1px 0 0" }}>{task.date} · {task.category}</p>
+                <div key={task.id} className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${isDark ? "bg-slate-900/50 border-slate-700" : "bg-slate-50 border-slate-100"
+                  }`}>
+                  <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: pc.dot }} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{task.title}</p>
+                    <p className={`text-xs truncate ${isDark ? "text-slate-500" : "text-slate-500"}`}>{task.date} · {task.category}</p>
                   </div>
-                  <button onClick={() => completeTask(task.id)} title="Complete"
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "#22c55e", padding: 4 }}>
+                  <button onClick={() => completeTask(task.id)} className="p-1 text-green-500 hover:bg-green-500/10 rounded-lg transition-colors">
                     <CheckCircle2 size={14} />
                   </button>
-                  <button onClick={() => deleteTask(task.id)} title="Delete"
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", padding: 4 }}>
+                  <button onClick={() => deleteTask(task.id)} className="p-1 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors">
                     <Trash2 size={12} />
                   </button>
                 </div>
               );
             })}
             {pendingTasks.length > 12 && (
-              <p style={{ fontSize: 12, color: textMuted, gridColumn: "span 2", textAlign: "center", padding: "8px 0" }}>
+              <p className={`text-xs text-center col-span-1 md:col-span-2 py-2 ${isDark ? "text-slate-500" : "text-slate-400"}`}>
                 +{pendingTasks.length - 12} more tasks — view all on Priority Board
               </p>
             )}
           </div>
         )}
       </div>
-
-      <style>{`
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-      `}</style>
     </div>
   );
 };

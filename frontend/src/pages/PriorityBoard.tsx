@@ -31,10 +31,7 @@ const PriorityBoard = ({ isDark = false }: PriorityBoardProps) => {
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
 
-  const textPrimary = isDark ? "#e2e8f0" : "#1e293b";
-  const textSecondary = isDark ? "#94a3b8" : "#64748b";
-  const card = isDark ? "#1e293b" : "#ffffff";
-  const border = isDark ? "#334155" : "#e2e8f0";
+
 
   const fetchTasks = () => {
     apiFetch("/priority-tasks")
@@ -102,17 +99,17 @@ const PriorityBoard = ({ isDark = false }: PriorityBoardProps) => {
   const totalTasks = tasks.high.length + tasks.medium.length + tasks.low.length;
 
   return (
-    <div style={{ padding: 24, fontFamily: "'Inter', sans-serif", color: textPrimary, minHeight: "100%" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-        <div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>Priority Board</h1>
-          <p style={{ fontSize: 13, color: textSecondary, margin: "4px 0 0" }}>
+    <div className={`p-4 md:p-6 min-h-full font-sans ${isDark ? "bg-slate-900 text-slate-200" : "bg-slate-50/50 text-slate-900"}`}>
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-2">
+        <div className="w-full sm:w-auto">
+          <h1 className="text-2xl font-bold m-0">Priority Board</h1>
+          <p className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
             Drag tasks between columns to change priority · {totalTasks} tasks
           </p>
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, minHeight: 500 }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 min-h-[500px]">
         {COLUMNS.map((col) => {
           const colTasks = tasks[col.key] || [];
           const isOver = dragOverColumn === col.key;
@@ -123,91 +120,67 @@ const PriorityBoard = ({ isDark = false }: PriorityBoardProps) => {
               onDragOver={(e) => handleDragOver(e, col.key)}
               onDragLeave={handleDragLeave}
               onDrop={() => handleDrop(col.key)}
+              className={`rounded-2xl border p-4 transition-all duration-200 flex flex-col ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200 shadow-sm"
+                } ${isOver ? "ring-2 ring-indigo-500 scale-[1.02]" : ""}`}
               style={{
-                background: card,
-                borderRadius: 14,
-                border: isOver ? `2px dashed ${col.color}` : `1px solid ${border}`,
-                padding: 16,
-                transition: "border 0.2s",
+                borderColor: isOver ? col.color : undefined
               }}
             >
               {/* Column Header */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, paddingBottom: 12, borderBottom: `1px solid ${border}` }}>
-                <h2 style={{ fontSize: 14, fontWeight: 700, margin: 0 }}>{col.label}</h2>
-                <span style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  padding: "3px 10px",
-                  borderRadius: 10,
-                  background: isDark ? `${col.color}20` : col.bg,
-                  color: col.color,
-                }}>
+              <div className={`flex justify-between items-center mb-4 pb-3 border-b ${isDark ? "border-slate-700" : "border-slate-100"}`}>
+                <h2 className="text-sm font-bold m-0 uppercase tracking-wide">{col.label}</h2>
+                <span
+                  className="text-xs font-bold px-2.5 py-0.5 rounded-lg"
+                  style={{
+                    background: isDark ? `${col.color}20` : col.bg,
+                    color: col.color,
+                  }}
+                >
                   {colTasks.length}
                 </span>
               </div>
 
               {/* Task Cards */}
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, minHeight: 100 }}>
+              <div className="flex flex-col gap-3 flex-1 min-h-[100px]">
                 {colTasks.map((task) => (
                   <div
                     key={task.id}
                     draggable
                     onDragStart={() => handleDragStart(task)}
+                    className={`p-3 rounded-xl border-l-4 cursor-grab active:cursor-grabbing transition-all hover:-translate-y-0.5 hover:shadow-md flex gap-3 group ${isDark ? "bg-slate-900/50" : "bg-slate-50"
+                      }`}
                     style={{
-                      padding: "12px 14px",
-                      borderRadius: 10,
-                      background: isDark ? "#0f172a" : col.bg,
-                      borderLeft: `3px solid ${col.color}`,
-                      cursor: "grab",
-                      transition: "transform 0.15s, box-shadow 0.15s",
-                      display: "flex",
-                      gap: 8,
+                      borderLeftColor: col.color,
+                      background: isDark ? undefined : col.bg,
                     }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)"; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = ""; (e.currentTarget as HTMLElement).style.boxShadow = ""; }}
                   >
-                    <GripVertical size={14} style={{ color: textSecondary, marginTop: 2, flexShrink: 0, opacity: 0.5 }} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{
-                        fontSize: 13,
-                        fontWeight: 600,
-                        margin: 0,
-                        textDecoration: task.status === "completed" ? "line-through" : "none",
-                        opacity: task.status === "completed" ? 0.5 : 1,
-                        wordBreak: "break-word",
-                      }}>
+                    <GripVertical size={16} className={`mt-0.5 flex-shrink-0 ${isDark ? "text-slate-600" : "text-slate-400 opacity-50"}`} />
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-semibold m-0 truncate ${task.status === "completed" ? "line-through opacity-50" : ""}`}>
                         {task.title}
                       </p>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
-                        <span style={{ fontSize: 10, color: textSecondary }}>{task.date}</span>
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <span className={`text-[10px] ${isDark ? "text-slate-500" : "text-slate-500"}`}>{task.date}</span>
                         {task.category && (
-                          <span style={{
-                            fontSize: 10,
-                            padding: "1px 6px",
-                            borderRadius: 4,
-                            background: isDark ? "#334155" : "#f1f5f9",
-                            color: textSecondary,
-                          }}>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded ${isDark ? "bg-slate-800" : "bg-white/50"}`}>
                             {task.category}
                           </span>
                         )}
                       </div>
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }}>
-                      <button onClick={() => completeTask(task)} title="Complete"
-                        style={{ background: "none", border: "none", cursor: "pointer", color: "#22c55e", padding: 2 }}>
+                    <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onClick={() => completeTask(task)} className="p-1 text-green-500 hover:bg-green-500/10 rounded transition-colors">
                         <CheckCircle2 size={14} />
                       </button>
-                      <button onClick={() => deleteTask(task)} title="Delete"
-                        style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", padding: 2 }}>
-                        <Trash2 size={12} />
+                      <button onClick={() => deleteTask(task)} className="p-1 text-red-500 hover:bg-red-500/10 rounded transition-colors">
+                        <Trash2 size={14} />
                       </button>
                     </div>
                   </div>
                 ))}
 
                 {colTasks.length === 0 && (
-                  <div style={{ textAlign: "center", padding: "30px 0", color: textSecondary, fontSize: 13 }}>
+                  <div className={`text-center py-8 text-sm italic ${isDark ? "text-slate-600" : "text-slate-400"}`}>
                     No {col.key} priority tasks
                   </div>
                 )}

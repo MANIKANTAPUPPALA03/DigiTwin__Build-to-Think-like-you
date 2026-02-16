@@ -9,7 +9,8 @@ import {
   Moon,
   Sun,
   X,
-  AlertCircle
+  AlertCircle,
+  Menu
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import FloatingAssistant from "./FloatingAssistant";
@@ -33,6 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ isDark, setIsDark, children }) => {
     return localStorage.getItem('agent_active') !== 'false';
   });
   const [highPriorityTasks, setHighPriorityTasks] = React.useState<any[]>([]);
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
   const { user } = useAuth();
 
@@ -233,18 +235,30 @@ const Layout: React.FC<LayoutProps> = ({ isDark, setIsDark, children }) => {
         <rect width="100%" height="100%" fill="url(#neural)" />
       </svg>
 
-      <aside
-        className={`w-64 border-r flex flex-col relative z-10 flex-shrink-0 ${isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"
+      <div
+        className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 md:hidden ${isSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
+        onClick={() => setIsSidebarOpen(false)}
+      />
+
+      <aside
+        className={`fixed md:relative z-50 h-full w-64 border-r flex flex-col flex-shrink-0 transition-transform duration-300 ease-in-out ${isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"
+          } ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
         <div
-          className={`p-6 border-b ${isDark ? "border-slate-800" : "border-slate-200"
+          className={`p-6 border-b flex justify-between items-center ${isDark ? "border-slate-800" : "border-slate-200"
             }`}
         >
-          <Link to="/dashboard" className="flex items-center gap-3">
+          <Link to="/dashboard" className="flex items-center gap-3" onClick={() => setIsSidebarOpen(false)}>
             <img src={logo} alt="DigiTwin Logo" className="w-10 h-10 object-contain" />
             <span className="font-bold text-lg">DigiTwin</span>
           </Link>
+          <button
+            onClick={() => setIsSidebarOpen(false)}
+            className="md:hidden p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
+            <X size={20} />
+          </button>
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
@@ -316,15 +330,27 @@ const Layout: React.FC<LayoutProps> = ({ isDark, setIsDark, children }) => {
             : "bg-white border-slate-200"
             } px-8 py-6`}
         >
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold mb-1">Welcome back, {user?.name?.split(' ')[0] || 'User'}</h1>
-              <p className={isDark ? "text-slate-400" : "text-slate-500"}>
-                Here's what's happening with your tasks today
-              </p>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                style={{ background: isDark ? "#1e293b" : "#f1f5f9" }}
+              >
+                <Menu size={20} />
+              </button>
+              <div>
+                <h1 className="text-xl md:text-2xl font-bold mb-1">
+                  <span className="md:hidden">Hi, {user?.name?.split(' ')[0] || 'User'}</span>
+                  <span className="hidden md:inline">Welcome back, {user?.name?.split(' ')[0] || 'User'}</span>
+                </h1>
+                <p className={`hidden md:block ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                  Here's what's happening with your tasks today
+                </p>
+              </div>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 md:gap-4">
+              <div className="hidden md:flex items-center gap-2">
                 <div
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${isAgentActive
                     ? isDark ? "#1e293b" : "#f1f5f9"
@@ -406,7 +432,7 @@ const Layout: React.FC<LayoutProps> = ({ isDark, setIsDark, children }) => {
               </button>
               <button
                 onClick={() => setShowNewTaskModal(true)}
-                className={`flex items-center gap-2 px-4 py-2.5 text-white rounded-xl font-medium transition-all shadow-sm hover:shadow-lg hover:-translate-y-0.5 ${isDark ? 'bg-gradient-to-r from-purple-600 to-cyan-600' : 'bg-gradient-to-r from-blue-600 to-cyan-600'
+                className={`hidden md:flex items-center gap-2 px-4 py-2.5 text-white rounded-xl font-medium transition-all shadow-sm hover:shadow-lg hover:-translate-y-0.5 ${isDark ? 'bg-gradient-to-r from-purple-600 to-cyan-600' : 'bg-gradient-to-r from-blue-600 to-cyan-600'
                   }`}
               >
                 <Plus size={18} />

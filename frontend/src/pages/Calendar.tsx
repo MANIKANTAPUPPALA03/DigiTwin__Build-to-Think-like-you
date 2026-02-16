@@ -147,136 +147,56 @@ const Calendar: React.FC<CalendarProps> = ({ isDark = false }) => {
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          gap: 24,
-          height: "100%",
-          fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-          color: isDark ? "#e2e8f0" : "#1e293b",
-        }}
-      >
+      <div className={`flex flex-col lg:flex-row gap-6 h-full font-sans ${isDark ? "text-slate-200" : "text-slate-800"}`}>
         {/* ═══ LEFT: Calendar Grid ═══ */}
-        <div
-          style={{
-            flex: 1,
-            background: isDark ? "#1e293b" : "#ffffff",
-            borderRadius: 16,
-            padding: 24,
-            boxShadow: isDark ? "none" : "0 1px 3px rgba(0,0,0,0.08)",
-            border: `1px solid ${isDark ? "#334155" : "#e2e8f0"}`,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+        <div className={`flex-1 flex flex-col p-4 md:p-6 rounded-2xl border transition-colors ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-white border-slate-200 shadow-sm"}`}>
           {/* Header */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 20,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <h2 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+            <div className="flex items-center gap-4">
+              <h2 className="text-xl md:text-2xl font-bold m-0">
                 {monthName} {year}
               </h2>
               {!isCurrentMonth && (
                 <button
                   onClick={goToToday}
-                  style={{
-                    padding: "4px 12px",
-                    fontSize: 12,
-                    borderRadius: 6,
-                    border: `1px solid ${isDark ? "#475569" : "#cbd5e1"}`,
-                    background: "transparent",
-                    color: isDark ? "#94a3b8" : "#64748b",
-                    cursor: "pointer",
-                  }}
+                  className={`px-3 py-1 text-xs rounded-md border bg-transparent cursor-pointer transition-colors ${isDark ? "border-slate-600 text-slate-400 hover:text-slate-200" : "border-slate-300 text-slate-500 hover:text-slate-700"
+                    }`}
                 >
                   Today
                 </button>
               )}
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div className="flex items-center gap-2">
               <button
                 onClick={goToPrevMonth}
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 8,
-                  border: `1px solid ${isDark ? "#475569" : "#e2e8f0"}`,
-                  background: "transparent",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: isDark ? "#94a3b8" : "#64748b",
-                }}
+                className={`w-8 h-8 rounded-lg border bg-transparent cursor-pointer flex items-center justify-center transition-colors ${isDark ? "border-slate-600 text-slate-400 hover:bg-slate-700" : "border-slate-200 text-slate-500 hover:bg-slate-50"
+                  }`}
               >
                 <ChevronLeft size={16} />
               </button>
               <button
                 onClick={goToNextMonth}
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 8,
-                  border: `1px solid ${isDark ? "#475569" : "#e2e8f0"}`,
-                  background: "transparent",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: isDark ? "#94a3b8" : "#64748b",
-                }}
+                className={`w-8 h-8 rounded-lg border bg-transparent cursor-pointer flex items-center justify-center transition-colors ${isDark ? "border-slate-600 text-slate-400 hover:bg-slate-700" : "border-slate-200 text-slate-500 hover:bg-slate-50"
+                  }`}
               >
                 <ChevronRight size={16} />
               </button>
               <button
                 onClick={() => setShowModal(true)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  padding: "6px 16px",
-                  background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 8,
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  marginLeft: 8,
-                }}
+                className="flex items-center gap-2 px-4 py-1.5 ml-2 bg-gradient-to-br from-indigo-500 to-violet-600 text-white border-none rounded-lg text-sm font-semibold cursor-pointer shadow-md shadow-indigo-500/20 active:scale-95 transition-transform"
               >
-                <Plus size={14} /> New Event
+                <Plus size={14} /> <span className="hidden sm:inline">New Event</span><span className="sm:hidden">New</span>
               </button>
             </div>
           </div>
 
           {/* Day Headers */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(7, 1fr)",
-              marginBottom: 8,
-            }}
-          >
+          <div className="grid grid-cols-7 mb-2">
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
               <div
                 key={d}
-                style={{
-                  textAlign: "center",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: isDark ? "#64748b" : "#94a3b8",
-                  padding: "4px 0",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.5,
-                }}
+                className={`text-center text-xs font-semibold py-1 uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}
               >
                 {d}
               </div>
@@ -284,14 +204,7 @@ const Calendar: React.FC<CalendarProps> = ({ isDark = false }) => {
           </div>
 
           {/* Calendar Grid */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(7, 1fr)",
-              gap: 4,
-              flex: 1,
-            }}
-          >
+          <div className="grid grid-cols-7 gap-1 md:gap-1.5 flex-1">
             {/* Empty cells for start day offset */}
             {Array.from({ length: startDay }).map((_, i) => (
               <div key={`empty-${i}`} />
@@ -308,109 +221,70 @@ const Calendar: React.FC<CalendarProps> = ({ isDark = false }) => {
                 <div
                   key={day}
                   onClick={() => setSelectedDay(day)}
+                  className={`relative rounded-xl p-1 md:p-2 min-h-[60px] md:min-h-[80px] cursor-pointer border transition-all ${isSelected
+                      ? "ring-2 ring-indigo-500 z-10"
+                      : isDark ? "border-slate-700 hover:border-slate-600" : "border-slate-100 hover:border-slate-300"
+                    } ${isSelected
+                      ? (isDark ? "bg-indigo-950/30" : "bg-indigo-50")
+                      : (isDark ? "bg-slate-900/50" : "bg-slate-50/50")
+                    }`}
                   style={{
-                    borderRadius: 10,
-                    padding: "6px 8px",
-                    minHeight: 80,
-                    cursor: "pointer",
-                    border: isSelected
-                      ? "2px solid #6366f1"
-                      : `1px solid ${isDark ? "#334155" : "#f1f5f9"}`,
-                    background: isSelected
-                      ? isDark
-                        ? "#1e1b4b"
-                        : "#eef2ff"
-                      : isDark
-                        ? "#0f172a"
-                        : "#fafafa",
-                    transition: "all 0.15s",
+                    borderColor: isSelected ? "#6366f1" : undefined
                   }}
                 >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      marginBottom: 4,
-                    }}
-                  >
+                  <div className="flex justify-between items-start mb-1">
                     <span
-                      style={{
-                        fontSize: 13,
-                        fontWeight: isToday ? 700 : 500,
-                        width: isToday ? 26 : undefined,
-                        height: isToday ? 26 : undefined,
-                        borderRadius: "50%",
-                        background: isToday ? "#6366f1" : "transparent",
-                        color: isToday ? "#fff" : isDark ? "#cbd5e1" : "#334155",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
+                      className={`text-sm md:text-sm font-medium w-6 h-6 flex items-center justify-center rounded-full ${isToday
+                          ? "bg-indigo-600 text-white font-bold shadow-sm"
+                          : (isDark ? "text-slate-400" : "text-slate-600")
+                        }`}
                     >
                       {day}
                     </span>
                     {totalItems > 0 && (
-                      <span
-                        style={{
-                          fontSize: 10,
-                          background: isDark ? "#334155" : "#e2e8f0",
-                          borderRadius: 10,
-                          padding: "1px 6px",
-                          color: isDark ? "#94a3b8" : "#64748b",
-                        }}
-                      >
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${isDark ? "bg-slate-700 text-slate-300" : "bg-slate-200 text-slate-600"
+                        }`}>
                         {totalItems}
                       </span>
                     )}
                   </div>
 
-                  {/* Event dots */}
-                  {items.events.slice(0, 2).map((ev, idx) => {
-                    const c = getEventColor(idx);
-                    return (
+                  {/* Event dots (Mobile: just dots, Desktop: text) */}
+                  <div className="hidden md:block space-y-0.5">
+                    {items.events.slice(0, 2).map((ev, idx) => {
+                      const c = getEventColor(idx);
+                      return (
+                        <div
+                          key={ev.id}
+                          className="text-[10px] px-1.5 py-0.5 rounded truncate font-medium"
+                          style={{ background: c.bg, color: c.text }}
+                        >
+                          {ev.title}
+                        </div>
+                      );
+                    })}
+                    {items.tasks.slice(0, 1).map((t) => (
                       <div
-                        key={ev.id}
-                        style={{
-                          fontSize: 10,
-                          padding: "2px 6px",
-                          borderRadius: 4,
-                          marginBottom: 2,
-                          background: c.bg,
-                          color: c.text,
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          fontWeight: 500,
-                        }}
+                        key={t.id}
+                        className="text-[10px] px-1.5 py-0.5 rounded truncate font-medium bg-amber-100 text-amber-800"
                       >
-                        {ev.title}
+                        📋 {t.title}
                       </div>
-                    );
-                  })}
-                  {items.tasks.slice(0, 1).map((t) => (
-                    <div
-                      key={t.id}
-                      style={{
-                        fontSize: 10,
-                        padding: "2px 6px",
-                        borderRadius: 4,
-                        background: "#fef3c7",
-                        color: "#92400e",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        fontWeight: 500,
-                      }}
-                    >
-                      📋 {t.title}
-                    </div>
-                  ))}
-                  {totalItems > 3 && (
-                    <div style={{ fontSize: 10, color: isDark ? "#64748b" : "#94a3b8", marginTop: 2 }}>
-                      +{totalItems - 3} more
-                    </div>
-                  )}
+                    ))}
+                    {totalItems > 3 && (
+                      <div className={`text-[10px] pl-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                        +{totalItems - 3} more
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Mobile Dots */}
+                  <div className="md:hidden flex gap-0.5 flex-wrap content-end h-full pb-1 pl-1">
+                    {items.events.slice(0, 3).map((_, idx) => (
+                      <div key={idx} className="w-1.5 h-1.5 rounded-full" style={{ background: getEventColor(idx).dot }} />
+                    ))}
+                    {items.tasks.length > 0 && <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />}
+                  </div>
                 </div>
               );
             })}
@@ -418,19 +292,8 @@ const Calendar: React.FC<CalendarProps> = ({ isDark = false }) => {
         </div>
 
         {/* ═══ RIGHT: Selected Day Details ═══ */}
-        <div
-          style={{
-            width: 320,
-            minWidth: 320,
-            background: isDark ? "#1e293b" : "#ffffff",
-            borderRadius: 16,
-            padding: 24,
-            boxShadow: isDark ? "none" : "0 1px 3px rgba(0,0,0,0.08)",
-            border: `1px solid ${isDark ? "#334155" : "#e2e8f0"}`,
-            overflowY: "auto",
-          }}
-        >
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>
+        <div className={`w-full lg:w-80 flex-shrink-0 rounded-2xl p-6 border overflow-y-auto ${isDark ? "bg-slate-800/50 border-slate-700" : "bg-white border-slate-200 shadow-sm"}`}>
+          <h3 className="text-base font-bold mb-4">
             {selectedDay
               ? new Date(year, month, selectedDay).toLocaleDateString("en-US", {
                 weekday: "long",
@@ -444,17 +307,8 @@ const Calendar: React.FC<CalendarProps> = ({ isDark = false }) => {
             <>
               {/* Google Calendar Events */}
               {selectedItems.events.length > 0 && (
-                <div style={{ marginBottom: 20 }}>
-                  <p
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 600,
-                      textTransform: "uppercase",
-                      letterSpacing: 0.5,
-                      color: isDark ? "#64748b" : "#94a3b8",
-                      marginBottom: 8,
-                    }}
-                  >
+                <div className="mb-6">
+                  <p className={`text-xs font-bold uppercase tracking-wider mb-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>
                     📅 Calendar Events
                   </p>
                   {selectedItems.events.map((ev, idx) => {
@@ -462,36 +316,33 @@ const Calendar: React.FC<CalendarProps> = ({ isDark = false }) => {
                     return (
                       <div
                         key={ev.id}
+                        className={`p-3 rounded-xl mb-2 border-l-4 ${isDark ? "bg-slate-900/50 border-r border-y border-r-slate-800 border-y-slate-800" : ""}`}
                         style={{
-                          padding: 12,
-                          borderRadius: 10,
-                          marginBottom: 8,
-                          background: isDark ? "#0f172a" : c.bg,
-                          border: `1px solid ${isDark ? "#334155" : "transparent"}`,
-                          borderLeft: `4px solid ${c.dot}`,
+                          background: isDark ? undefined : c.bg,
+                          borderLeftColor: c.dot,
                         }}
                       >
-                        <p style={{ fontWeight: 600, fontSize: 14, margin: "0 0 4px", color: isDark ? "#e2e8f0" : c.text }}>
+                        <p className={`text-sm font-semibold mb-1 ${isDark ? "text-slate-200" : ""}`} style={{ color: isDark ? undefined : c.text }}>
                           {ev.title}
                         </p>
                         {!ev.all_day && (
-                          <p style={{ fontSize: 12, color: isDark ? "#94a3b8" : "#64748b", margin: "0 0 2px", display: "flex", alignItems: "center", gap: 4 }}>
+                          <p className={`text-xs flex items-center gap-1.5 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
                             <Clock size={12} /> {formatTime(ev.start)} – {formatTime(ev.end)}
                           </p>
                         )}
                         {ev.all_day && (
-                          <p style={{ fontSize: 12, color: isDark ? "#94a3b8" : "#64748b", margin: "0 0 2px" }}>
+                          <p className={`text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>
                             All day
                           </p>
                         )}
                         {ev.location && (
-                          <p style={{ fontSize: 12, color: isDark ? "#94a3b8" : "#64748b", margin: "2px 0 0", display: "flex", alignItems: "center", gap: 4 }}>
+                          <p className={`text-xs mt-1 flex items-center gap-1.5 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
                             <MapPin size={12} /> {ev.location}
                           </p>
                         )}
                         {ev.description && (
-                          <p style={{ fontSize: 12, color: isDark ? "#64748b" : "#94a3b8", margin: "6px 0 0", lineHeight: 1.4 }}>
-                            {ev.description.substring(0, 120)}{ev.description.length > 120 ? "..." : ""}
+                          <p className={`text-xs mt-2 line-clamp-3 leading-relaxed ${isDark ? "text-slate-500" : "text-slate-600"}`}>
+                            {ev.description}
                           </p>
                         )}
                       </div>
@@ -503,31 +354,16 @@ const Calendar: React.FC<CalendarProps> = ({ isDark = false }) => {
               {/* Tasks */}
               {selectedItems.tasks.length > 0 && (
                 <div>
-                  <p
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 600,
-                      textTransform: "uppercase",
-                      letterSpacing: 0.5,
-                      color: isDark ? "#64748b" : "#94a3b8",
-                      marginBottom: 8,
-                    }}
-                  >
+                  <p className={`text-xs font-bold uppercase tracking-wider mb-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>
                     📋 Tasks
                   </p>
                   {selectedItems.tasks.map((t) => (
                     <div
                       key={t.id}
-                      style={{
-                        padding: 12,
-                        borderRadius: 10,
-                        marginBottom: 8,
-                        background: isDark ? "#0f172a" : "#fef3c7",
-                        border: `1px solid ${isDark ? "#334155" : "transparent"}`,
-                        borderLeft: "4px solid #f59e0b",
-                      }}
+                      className={`p-3 rounded-xl mb-2 border-l-4 border-amber-500 ${isDark ? "bg-slate-900/50 border border-slate-800" : "bg-amber-50"}`}
+                      style={{ borderLeftColor: "#f59e0b" }}
                     >
-                      <p style={{ fontWeight: 600, fontSize: 14, margin: 0, color: isDark ? "#e2e8f0" : "#92400e" }}>
+                      <p className={`text-sm font-semibold m-0 ${isDark ? "text-slate-200" : "text-amber-900"}`}>
                         {t.title}
                       </p>
                     </div>
@@ -537,15 +373,9 @@ const Calendar: React.FC<CalendarProps> = ({ isDark = false }) => {
 
               {/* Empty state */}
               {selectedItems.events.length === 0 && selectedItems.tasks.length === 0 && (
-                <div
-                  style={{
-                    textAlign: "center",
-                    padding: "40px 0",
-                    color: isDark ? "#475569" : "#94a3b8",
-                  }}
-                >
-                  <div style={{ fontSize: 32, marginBottom: 8 }}>🌤️</div>
-                  <p style={{ fontSize: 14 }}>No events for this day</p>
+                <div className={`text-center py-10 ${isDark ? "text-slate-600" : "text-slate-400"}`}>
+                  <div className="text-3xl mb-2">🌤️</div>
+                  <p className="text-sm">No events for this day</p>
                 </div>
               )}
             </>
@@ -555,45 +385,14 @@ const Calendar: React.FC<CalendarProps> = ({ isDark = false }) => {
 
       {/* ═══ Create Event Modal ═══ */}
       {showModal && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 50,
-            backdropFilter: "blur(4px)",
-          }}
-        >
-          <div
-            style={{
-              background: isDark ? "#1e293b" : "#ffffff",
-              borderRadius: 16,
-              padding: 24,
-              width: "100%",
-              maxWidth: 420,
-              boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
-              border: `1px solid ${isDark ? "#334155" : "#e2e8f0"}`,
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Create New Event</h3>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className={`w-full max-w-md rounded-2xl p-6 shadow-2xl border ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"}`}>
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="text-lg font-bold m-0">Create New Event</h3>
               <button
                 onClick={() => setShowModal(false)}
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 8,
-                  border: "none",
-                  background: isDark ? "#334155" : "#f1f5f9",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: isDark ? "#94a3b8" : "#64748b",
-                }}
+                className={`w-8 h-8 rounded-lg flex items-center justify-center border-none cursor-pointer transition-colors ${isDark ? "bg-slate-700 text-slate-400 hover:text-slate-200" : "bg-slate-100 text-slate-500 hover:text-slate-700"
+                  }`}
               >
                 <X size={16} />
               </button>
@@ -604,8 +403,8 @@ const Calendar: React.FC<CalendarProps> = ({ isDark = false }) => {
                 { label: "Title", type: "text", key: "title", required: true, placeholder: "Enter event title" },
                 { label: "Date", type: "date", key: "date", required: true },
               ].map(({ label, type, key, required, placeholder }) => (
-                <div key={key} style={{ marginBottom: 16 }}>
-                  <label style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 6, color: isDark ? "#94a3b8" : "#475569" }}>
+                <div key={key} className="mb-4">
+                  <label className={`block text-xs font-bold mb-1.5 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                     {label}
                   </label>
                   <input
@@ -614,23 +413,14 @@ const Calendar: React.FC<CalendarProps> = ({ isDark = false }) => {
                     placeholder={placeholder}
                     value={(newTask as any)[key]}
                     onChange={(e) => setNewTask({ ...newTask, [key]: e.target.value })}
-                    style={{
-                      width: "100%",
-                      padding: "10px 12px",
-                      borderRadius: 8,
-                      border: `1px solid ${isDark ? "#475569" : "#e2e8f0"}`,
-                      background: isDark ? "#0f172a" : "#f8fafc",
-                      color: isDark ? "#e2e8f0" : "#1e293b",
-                      fontSize: 14,
-                      outline: "none",
-                      boxSizing: "border-box",
-                    }}
+                    className={`w-full px-3 py-2.5 rounded-lg text-sm border focus:outline-none focus:ring-2 focus:ring-indigo-500/50 ${isDark ? "bg-slate-900 border-slate-700 text-slate-200 placeholder:text-slate-600" : "bg-slate-50 border-slate-200 text-slate-800"
+                      }`}
                   />
                 </div>
               ))}
 
-              <div style={{ marginBottom: 16 }}>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 6, color: isDark ? "#94a3b8" : "#475569" }}>
+              <div className="mb-4">
+                <label className={`block text-xs font-bold mb-1.5 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                   Description
                 </label>
                 <textarea
@@ -638,48 +428,25 @@ const Calendar: React.FC<CalendarProps> = ({ isDark = false }) => {
                   onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
                   rows={3}
                   placeholder="Optional description"
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    borderRadius: 8,
-                    border: `1px solid ${isDark ? "#475569" : "#e2e8f0"}`,
-                    background: isDark ? "#0f172a" : "#f8fafc",
-                    color: isDark ? "#e2e8f0" : "#1e293b",
-                    fontSize: 14,
-                    outline: "none",
-                    resize: "vertical",
-                    boxSizing: "border-box",
-                  }}
+                  className={`w-full px-3 py-2.5 rounded-lg text-sm border focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-y ${isDark ? "bg-slate-900 border-slate-700 text-slate-200 placeholder:text-slate-600" : "bg-slate-50 border-slate-200 text-slate-800"
+                    }`}
                 />
               </div>
 
-              <div style={{ marginBottom: 20 }}>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 6, color: isDark ? "#94a3b8" : "#475569" }}>
+              <div className="mb-6">
+                <label className={`block text-xs font-bold mb-1.5 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                   Priority
                 </label>
-                <div style={{ display: "flex", gap: 8 }}>
+                <div className="flex gap-2">
                   {(["low", "medium", "high"] as const).map((p) => (
                     <button
                       key={p}
                       type="button"
                       onClick={() => setNewTask({ ...newTask, priority: p })}
-                      style={{
-                        flex: 1,
-                        padding: "8px 0",
-                        borderRadius: 8,
-                        border: newTask.priority === p ? "2px solid" : `1px solid ${isDark ? "#475569" : "#e2e8f0"}`,
-                        borderColor: newTask.priority === p
-                          ? p === "high" ? "#ef4444" : p === "medium" ? "#f59e0b" : "#22c55e"
-                          : undefined,
-                        background: newTask.priority === p
-                          ? p === "high" ? "#fef2f2" : p === "medium" ? "#fefce8" : "#f0fdf4"
-                          : "transparent",
-                        color: p === "high" ? "#ef4444" : p === "medium" ? "#f59e0b" : "#22c55e",
-                        fontSize: 13,
-                        fontWeight: 600,
-                        cursor: "pointer",
-                        textTransform: "capitalize",
-                      }}
+                      className={`flex-1 py-2 rounded-lg text-xs font-bold capitalize border-2 transition-all ${newTask.priority === p
+                          ? (p === "high" ? "bg-red-50 border-red-500 text-red-600" : p === "medium" ? "bg-amber-50 border-amber-500 text-amber-600" : "bg-green-50 border-green-500 text-green-600")
+                          : (isDark ? "border-slate-700 bg-transparent text-slate-400 hover:bg-slate-700" : "border-slate-200 bg-transparent text-slate-500 hover:bg-slate-50")
+                        }`}
                     >
                       {p}
                     </button>
@@ -687,34 +454,18 @@ const Calendar: React.FC<CalendarProps> = ({ isDark = false }) => {
                 </div>
               </div>
 
-              <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+              <div className="flex gap-3 justify-end">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  style={{
-                    padding: "10px 20px",
-                    borderRadius: 8,
-                    border: `1px solid ${isDark ? "#475569" : "#e2e8f0"}`,
-                    background: "transparent",
-                    color: isDark ? "#94a3b8" : "#64748b",
-                    fontSize: 14,
-                    cursor: "pointer",
-                  }}
+                  className={`px-4 py-2.5 rounded-xl text-sm font-medium border cursor-pointer transition-colors ${isDark ? "border-slate-600 text-slate-400 hover:bg-slate-700" : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                    }`}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  style={{
-                    padding: "10px 24px",
-                    borderRadius: 8,
-                    border: "none",
-                    background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                    color: "#fff",
-                    fontSize: 14,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
+                  className="px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-indigo-500 to-violet-600 border-none shadow-lg shadow-indigo-500/25 cursor-pointer hover:shadow-indigo-500/40 transition-all active:scale-95"
                 >
                   Create
                 </button>

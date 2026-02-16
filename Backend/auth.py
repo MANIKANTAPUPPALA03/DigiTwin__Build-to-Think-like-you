@@ -52,5 +52,38 @@ def get_gmail_credentials(google_access_token: str):
         return None
 
     from google.oauth2.credentials import Credentials
-
     return Credentials(token=google_access_token)
+
+
+def exchange_code_for_token(code: str, redirect_uri: str) -> str:
+    """
+    Exchange authorization code for an access token.
+    Uses credentials.json to get client secret.
+    """
+    try:
+        from google_auth_oauthlib.flow import Flow
+        
+        # Ensure credentials.json exists
+        creds_path = "credentials.json"
+        if not os.path.exists(creds_path):
+            print("❌ credentials.json not found!")
+            return None
+
+        # Create flow
+        flow = Flow.from_client_secrets_file(
+            creds_path,
+            scopes=[
+                "https://www.googleapis.com/auth/gmail.readonly",
+                "https://www.googleapis.com/auth/calendar.readonly"
+            ],
+            redirect_uri=redirect_uri
+        )
+        
+        # Exchange code
+        flow.fetch_token(code=code)
+        credentials = flow.credentials
+        
+        return credentials.token
+    except Exception as e:
+        print(f"❌ Token exchange error: {e}")
+        return None

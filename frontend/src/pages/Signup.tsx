@@ -1,10 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const Signup: React.FC = () => {
-  const { signup, loginWithGoogle, error } = useAuth();
+  const { signup, error, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -24,17 +30,7 @@ const Signup: React.FC = () => {
     }
   };
 
-  const handleGoogleSignup = async () => {
-    setLoading(true);
-    try {
-      await loginWithGoogle();
-      navigate("/dashboard");
-    } catch {
-      // error handled in context
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
@@ -50,31 +46,6 @@ const Signup: React.FC = () => {
           <p className="text-slate-500">
             Start your journey with DigiTwin
           </p>
-        </div>
-
-        {/* Google Signup */}
-        <button
-          type="button"
-          onClick={handleGoogleSignup}   // ✅ THIS was missing/broken
-          disabled={loading}
-          className="w-full flex items-center justify-center gap-2 bg-white text-slate-700 border border-slate-200 py-3 rounded-xl font-medium hover:bg-slate-50 transition-colors"
-        >
-          <img
-            src="https://www.google.com/favicon.ico"
-            alt="Google"
-            className="w-5 h-5"
-          />
-          Sign up with Google
-        </button>
-
-        {/* Divider */}
-        <div className="relative flex items-center justify-center my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-200"></div>
-          </div>
-          <div className="relative bg-white px-4 text-sm text-slate-400">
-            or
-          </div>
         </div>
 
         {/* Signup Form */}
